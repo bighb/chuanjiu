@@ -1,0 +1,45 @@
+---
+// kind 的取值与 schema 的 skewering.diagram 枚举一一对应；'none' 时组件自己兜住，什么都不渲染。
+interface Props {
+  kind?: 'wave' | 'flat' | 'chunk' | 'none';
+}
+const { kind = 'none' } = Astro.props;
+---
+
+{
+  kind !== 'none' && (
+    <div class="skewer-diagram">
+      {kind === 'wave' && (
+        <svg viewBox="0 0 200 60" width="100%" height="60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="10" y1="30" x2="190" y2="30" stroke="var(--text-3)" />
+          <path d="M30 15 Q45 30 30 45 Q45 30 60 15 Q75 30 60 45" stroke="var(--accent)" />
+          <path d="M90 15 Q105 30 90 45 Q105 30 120 15 Q135 30 120 45" stroke="var(--accent)" />
+          <path d="M150 15 Q165 30 150 45 Q165 30 180 15" stroke="var(--accent)" />
+        </svg>
+      )}
+      {kind === 'flat' && (
+        <svg viewBox="0 0 200 60" width="100%" height="60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="10" y1="30" x2="190" y2="30" stroke="var(--text-3)" />
+          <path d="M25 25 L55 25 L55 35 L25 35 Z" stroke="var(--accent)" fill="var(--accent-soft)" />
+          <path d="M75 25 L105 25 L105 35 L75 35 Z" stroke="var(--accent)" fill="var(--accent-soft)" />
+          <path d="M125 25 L155 25 L155 35 L125 35 Z" stroke="var(--accent)" fill="var(--accent-soft)" />
+        </svg>
+      )}
+      {kind === 'chunk' && (
+        <svg viewBox="0 0 200 60" width="100%" height="60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="10" y1="30" x2="190" y2="30" stroke="var(--text-3)" />
+          <rect x="30" y="15" width="24" height="24" rx="4" stroke="var(--accent)" fill="var(--accent-soft)" />
+          <rect x="88" y="15" width="24" height="24" rx="4" stroke="var(--accent)" fill="var(--accent-soft)" />
+          <rect x="146" y="15" width="24" height="24" rx="4" stroke="var(--accent)" fill="var(--accent-soft)" />
+        </svg>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .skewer-diagram {
+    width: 100%;
+    color: var(--text-2);
+  }
+</style>

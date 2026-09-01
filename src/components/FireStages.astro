@@ -1,0 +1,83 @@
+---
+import { inline } from './inline';
+
+interface Props {
+  stages: { name: string; duration: string; body: string }[];
+}
+const { stages } = Astro.props;
+const barColor = (i: number, total: number) => {
+  if (i === 0) return 'var(--accent)';
+  if (i === total - 1) return 'var(--warn)';
+  return 'var(--accent-2)';
+};
+---
+
+<div class="fire-stages">
+  {
+    stages.map((s, i) => (
+      <div class="stage-card" style={`--bar-color: ${barColor(i, stages.length)}`}>
+        <div class="stage-head">
+          <span class="stage-name">{s.name}</span>
+          <span class="stage-duration">{s.duration}</span>
+        </div>
+        <p class="stage-body" set:html={inline(s.body)} />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .fire-stages {
+    display: flex;
+    gap: 12px;
+  }
+  .stage-card {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--bar-color);
+  }
+  .stage-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .stage-name {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .stage-duration {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bar-color);
+    white-space: nowrap;
+  }
+  .stage-body {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .stage-body :global(.hl) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .fire-stages {
+      flex-direction: column;
+    }
+  }
+</style>

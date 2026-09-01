@@ -1,0 +1,58 @@
+---
+import { inline } from './inline';
+
+interface Props {
+  items: { title: string; body: string }[];
+}
+const { items } = Astro.props;
+---
+
+<ul class="pitfall-list">
+  {
+    items.map((it) => (
+      <li class="pitfall-item">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pitfall-icon">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+        <div>
+          <p class="pitfall-title">{it.title}</p>
+          <p class="pitfall-body" set:html={inline(it.body)} />
+        </div>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .pitfall-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pitfall-item {
+    display: flex;
+    gap: 12px;
+  }
+  .pitfall-icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pitfall-title {
+    margin: 0 0 4px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .pitfall-body {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .pitfall-body :global(.hl) {
+    color: var(--accent);
+  }
+</style>

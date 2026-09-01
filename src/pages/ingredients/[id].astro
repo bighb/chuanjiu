@@ -1,0 +1,387 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { url } from '../../lib/url';
+import { inline } from '../../components/inline';
+import PhotoSlot from '../../components/PhotoSlot.astro';
+import SpecBar from '../../components/SpecBar.astro';
+import StepSection from '../../components/StepSection.astro';
+import RecipeTable from '../../components/RecipeTable.astro';
+import SeasoningTimeline from '../../components/SeasoningTimeline.astro';
+import FireStages from '../../components/FireStages.astro';
+import Callout from '../../components/Callout.astro';
+import PitfallList from '../../components/PitfallList.astro';
+import LocalCompare from '../../components/LocalCompare.astro';
+import SkewerDiagram from '../../components/SkewerDiagram.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('bbq');
+  const sorted = [...entries].sort((a, b) => a.data.order - b.data.order);
+  return sorted.map((entry, i) => ({
+    params: { id: entry.id },
+    props: {
+      entry,
+      prev: i > 0 ? sorted[i - 1] : null,
+      next: i < sorted.length - 1 ? sorted[i + 1] : null,
+    },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const hasBody = Boolean(entry.body && entry.body.trim().length > 0);
+const hasLocalVariants = Boolean(d.localVariants && (d.localVariants.wuhan || d.localVariants.anlu));
+const hasPitfalls = d.pitfalls.length > 0;
+---
+
+<BaseLayout title={d.name} description={d.summary}>
+  <nav class="breadcrumb" aria-label="面包屑">
+    <a href={url('ingredients')}>食材档案</a>
+    <span class="sep">/</span>
+    <span>{d.category}</span>
+    <span class="sep">/</span>
+    <span>{d.name}</span>
+  </nav>
+
+  <header class="detail-head">
+    <div class="title-block">
+      <h1>
+        {d.name}
+        {d.badge && <span class="badge-tag">{d.badge}</span>}
+        {d.status === 'draft' && <span class="status-tag">待验证</span>}
+      </h1>
+      <p class="intro" set:html={inline(d.intro)} />
+    </div>
+    <SpecBar specs={d.specs} />
+  </header>
+
+  <PhotoSlot photo={d.photo} alt={d.photoAlt} ratio="21/9" label="成品特写 · 待补实拍图" hint={d.photoHint} />
+
+  <div class="detail-body">
+    <nav class="step-nav" aria-label="步骤导航">
+      <a href="#step-01" data-step-link>01 取材</a>
+      <a href="#step-02" data-step-link>02 穿串</a>
+      <a href="#step-03" data-step-link>03 腌制</a>
+      <a href="#step-04" data-step-link>04 给料</a>
+      <a href="#step-05" data-step-link>05 火候</a>
+      {hasLocalVariants && (
+        <a href="#local-compare" data-step-link>地方做法对比</a>
+      )}
+      {hasPitfalls && (
+        <a href="#pitfalls" data-step-link>常见翻车点</a>
+      )}
+    </nav>
+
+    <div class="content-flow">
+      <StepSection no="01" title="取材" id="step-01">
+        <p set:html={inline(d.sourcing.body)} />
+        {d.sourcing.photo && <PhotoSlot photo={d.sourcing.photo} alt={d.sourcing.photoAlt} ratio="16/9" label="选材参考图 · 待补实拍图" hint={d.sourcing.photoHint} />}
+        {!d.sourcing.photo && d.sourcing.photoHint && <PhotoSlot ratio="16/9" label="选材参考图 · 待补实拍图" hint={d.sourcing.photoHint} />}
+        {d.sourcing.checks.length > 0 && (
+          <ul class="checks">
+            {d.sourcing.checks.map((c) => (
+              <li>
+                <strong>{c.title}</strong>
+                <span set:html={inline(c.body)} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </StepSection>
+
+      <StepSection no="02" title="穿串" id="step-02">
+        <p set:html={inline(d.skewering.body)} />
+        <SkewerDiagram kind={d.skewering.diagram} />
+        {d.skewering.diagramNote && <p class="diagram-note" set:html={inline(d.skewering.diagramNote)} />}
+        {d.skewering.photo && <PhotoSlot photo={d.skewering.photo} alt={d.skewering.photoAlt} ratio="4/3" label="穿串手法 · 待补实拍图" hint={d.skewering.photoHint} />}
+        {!d.skewering.photo && d.skewering.photoHint && <PhotoSlot ratio="4/3" label="穿串手法 · 待补实拍图" hint={d.skewering.photoHint} />}
+      </StepSection>
+
+      <StepSection no="03" title="腌制" id="step-03">
+        <p set:html={inline(d.marinating.body)} />
+        {d.marinating.recipe.length > 0 && <RecipeTable basis={d.marinating.basis} rows={d.marinating.recipe} />}
+        {d.marinating.callout && (
+          <Callout>
+            <p set:html={inline(d.marinating.callout)} />
+          </Callout>
+        )}
+      </StepSection>
+
+      <StepSection no="04" title="给料" id="step-04">
+        {d.seasoning.body && <p set:html={inline(d.seasoning.body)} />}
+        <SeasoningTimeline items={d.seasoning.timeline} />
+      </StepSection>
+
+      <StepSection no="05" title="火候" id="step-05">
+        {d.fire.body && <p set:html={inline(d.fire.body)} />}
+        <FireStages stages={d.fire.stages} />
+        {(d.fire.charcoal || d.fire.doneness) && (
+          <dl class="fire-notes">
+            {d.fire.charcoal && (
+              <>
+                <dt>用炭</dt>
+                <dd set:html={inline(d.fire.charcoal)} />
+              </>
+            )}
+            {d.fire.doneness && (
+              <>
+                <dt>怎么判断熟了</dt>
+                <dd set:html={inline(d.fire.doneness)} />
+              </>
+            )}
+          </dl>
+        )}
+        {d.fire.photo && <PhotoSlot photo={d.fire.photo} alt={d.fire.photoAlt} ratio="16/9" label="熟度判断参考图 · 待补实拍图" hint={d.fire.photoHint} />}
+        {!d.fire.photo && d.fire.photoHint && <PhotoSlot ratio="16/9" label="熟度判断参考图 · 待补实拍图" hint={d.fire.photoHint} />}
+      </StepSection>
+
+      {hasLocalVariants && (
+        <section id="local-compare">
+          <h2 class="section-title">地方做法对比</h2>
+          <LocalCompare wuhan={d.localVariants?.wuhan} anlu={d.localVariants?.anlu} />
+        </section>
+      )}
+
+      {hasPitfalls && (
+        <section id="pitfalls">
+          <h2 class="section-title">常见翻车点</h2>
+          <PitfallList items={d.pitfalls} />
+        </section>
+      )}
+
+      {hasBody && (
+        <section id="practice-notes">
+          <h2 class="section-title">实践记录</h2>
+          <div class="markdown-body">
+            <Content />
+          </div>
+        </section>
+      )}
+
+      <nav class="prev-next">
+        {prev ? <a href={url(`ingredients/${prev.id}`)}>← {prev.data.name}</a> : <a href={url('ingredients')}>← 返回食材档案</a>}
+        {next && <a href={url(`ingredients/${next.id}`)}>{next.data.name} →</a>}
+      </nav>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-step-link]');
+  const sections = Array.from(links)
+    .map((l) => document.querySelector(l.getAttribute('href')!))
+    .filter((el): el is Element => Boolean(el));
+
+  if (sections.length > 0) {
+    const setActive = (id: string) => {
+      links.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${id}`));
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: 0 }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+  }
+</script>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+  }
+  .breadcrumb a {
+    color: var(--text-3);
+  }
+  .breadcrumb a:hover {
+    color: var(--accent);
+  }
+  .sep {
+    color: var(--border);
+  }
+
+  .detail-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .title-block h1 {
+    font-family: var(--display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .badge-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .status-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+    background: var(--surface-2);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .intro {
+    max-width: 60ch;
+    color: var(--text-2);
+    line-height: 1.9;
+    margin: 0;
+  }
+  .intro :global(.hl) {
+    color: var(--accent);
+  }
+
+  .detail-body {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 40px;
+    margin-top: 32px;
+    align-items: start;
+  }
+  .step-nav {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .step-nav a {
+    font-size: 13px;
+    color: var(--text-2);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border-left: 2px solid transparent;
+  }
+  .step-nav a:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+  .step-nav a.active {
+    color: var(--accent);
+    font-weight: 700;
+    border-left-color: var(--accent);
+  }
+
+  .content-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+
+  .checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .checks li {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .checks strong {
+    color: var(--text);
+    margin-right: 6px;
+  }
+
+  .diagram-note {
+    font-size: 12px;
+    color: var(--text-3);
+    margin: 4px 0 0;
+  }
+
+  .fire-notes {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .fire-notes dt {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+  .fire-notes dd {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    margin: 0 0 16px;
+  }
+
+  .markdown-body {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.9;
+  }
+
+  .prev-next {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .prev-next a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .detail-body {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .step-nav {
+      position: sticky;
+      top: 0;
+      flex-direction: row;
+      overflow-x: auto;
+      background: var(--bg);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      z-index: 5;
+      gap: 8px;
+    }
+    .step-nav a {
+      white-space: nowrap;
+      border-left: none;
+      border: 1px solid var(--border);
+    }
+    .step-nav a.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+  }
+</style>

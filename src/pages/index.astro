@@ -1,0 +1,311 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/url';
+import PhotoSlot from '../components/PhotoSlot.astro';
+import IngredientCard from '../components/IngredientCard.astro';
+
+const entries = (await getCollection('bbq')).sort((a, b) => a.data.order - b.data.order);
+const featured = entries.slice(0, 3);
+
+const STEPS = [
+  {
+    no: '01',
+    name: '取材',
+    desc: '挑对部位和新鲜度，是好吃的起点。',
+    icon: 'M6 3v18M6 3l12 6-12 6',
+  },
+  {
+    no: '02',
+    name: '穿串',
+    desc: '厚薄、走向、间距，决定受热是否均匀。',
+    icon: 'M3 12h18M7 8v8M12 8v8M17 8v8',
+  },
+  {
+    no: '03',
+    name: '腌制',
+    desc: '基础调味打底，时长因食材而定。',
+    icon: 'M12 3c3 4 5 6.8 5 9.5a5 5 0 0 1-10 0C7 9.8 9 7 12 3Z',
+  },
+  {
+    no: '04',
+    name: '给料',
+    desc: '什么时候撒什么料，直接决定香不香。',
+    icon: 'M7 3v3M12 3v3M17 3v3M5 9h14l-1.5 11h-11L5 9Z',
+  },
+  {
+    no: '05',
+    name: '火候',
+    desc: '猛火、中火、文火如何分段，是核心功夫。',
+    icon: 'M12 3c1.5 3-3 4.5-3 8a3 3 0 0 0 6 0c0-1.5-1-2-1-3.5 1.5 1 2.5 2.5 2.5 4.5a5.5 5.5 0 1 1-11 0C5.5 8 8 6 12 3Z',
+  },
+];
+---
+
+<BaseLayout description="系统研究武汉、安陆一带烧烤的内容站，把每种食材从取材到火候的全流程拆开讲清楚">
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">
+        <span class="eyebrow-bar"></span>
+        系统研究武汉 · 安陆烧烤
+      </div>
+      <h1>把一串烧烤，讲究到底。</h1>
+      <p class="hero-desc">
+        不满足于「放多少盐、烤几分钟」——把每种食材从取材、穿串、腌制、给料到火候的全流程拆开讲清楚，讲清楚背后的为什么。首批收录 <strong class="hl">{entries.length}</strong> 种食材，持续更新中。
+      </p>
+      <div class="hero-actions">
+        <a href={url('ingredients')} class="btn btn-primary">浏览食材档案 →</a>
+        <a href="#process" class="btn btn-secondary">了解研究方法</a>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <PhotoSlot ratio="4/3" label="站点主视觉 · 待补实拍图" hint="整炉烧烤的全景，突出烟火气" />
+    </div>
+  </section>
+
+  <section class="process" id="process">
+    <h2 class="section-title">一串的全流程</h2>
+    <div class="step-grid">
+      {
+        STEPS.map((s) => (
+          <div class="step-card">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d={s.icon} />
+            </svg>
+            <span class="step-card-no">{s.no}</span>
+            <span class="step-card-name">{s.name}</span>
+            <p class="step-card-desc">{s.desc}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="featured">
+    <div class="featured-head">
+      <h2 class="section-title">精选档案</h2>
+      <a href={url('ingredients')} class="see-all">查看全部食材 →</a>
+    </div>
+    <div class="featured-grid">
+      {featured.map((entry) => <IngredientCard entry={entry} />)}
+    </div>
+  </section>
+
+  <section class="locales">
+    <h2 class="section-title">武汉与安陆</h2>
+    <div class="locale-grid">
+      <div class="locale-card wuhan">
+        <h3>武汉</h3>
+        <p>江城夜宵文化发达，摊子密、竞争足，口味整体偏向浓烈——重蒜香、爱刷复合酱汁，收尾常再补一轮料，层次感是卖点。</p>
+      </div>
+      <div class="locale-card anlu">
+        <h3>安陆</h3>
+        <p>相对内陆的小城节奏更松弛，口味偏朴素直接，多靠干料和炭火本身的烟熏味说话，不太依赖复杂酱汁堆味道。</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    margin: 0 0 24px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    padding: 24px 0 56px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .eyebrow-bar {
+    width: 24px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin: 0 0 16px;
+  }
+  .hero-desc {
+    color: var(--text-2);
+    line-height: 1.9;
+    max-width: 52ch;
+    margin: 0 0 28px;
+  }
+  .hero-desc :global(.hl) {
+    color: var(--accent);
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── 五步流程 ── */
+  .process {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .step-card svg {
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .step-card-no {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .step-card-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .step-card-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  /* ── 精选档案 ── */
+  .featured {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+  .featured-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0;
+  }
+  .featured-head .section-title {
+    margin-bottom: 24px;
+  }
+  .see-all {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  /* ── 武汉与安陆 ── */
+  .locales {
+    padding: 40px 0 56px;
+    border-top: 1px solid var(--border);
+  }
+  .locale-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .locale-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .locale-card.anlu {
+    border-top-color: var(--accent-2);
+  }
+  .locale-card h3 {
+    font-family: var(--display);
+    font-size: 18px;
+    margin: 0 0 10px;
+  }
+  .locale-card p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 1023px) {
+    .hero {
+      grid-template-columns: 1fr;
+    }
+    .hero-photo {
+      order: -1;
+    }
+    .step-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 639px) {
+    .step-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+    .locale-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-actions {
+      flex-direction: column;
+    }
+    .btn {
+      text-align: center;
+    }
+  }
+</style>

@@ -1,0 +1,165 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = '系统研究武汉、安陆一带烧烤的内容站' } = Astro.props;
+const pageTitle = title ? `${title} · 串究` : '串究 · 武汉/安陆烧烤研究站';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      // 无闪烁主题初始化：与门户站完全一致的机制（同源共享 localStorage，见 04 文档 §2）。
+      (function () {
+        var t = localStorage.getItem('theme');
+        document.documentElement.dataset.theme = t === 'dark' || t === 'light' ? t : 'light';
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="shell">
+      <SiteHeader />
+      <main class="main">
+        <slot />
+      </main>
+      <footer class="footer">
+        <span>串究 · 一个关于武汉、安陆烧烤的个人研究站</span>
+        <span class="muted">benrush.cn</span>
+      </footer>
+    </div>
+
+    <style is:global>
+      :root {
+        /* ── 砂石设计系统 · 亮色（默认）—— 取值照抄门户站，见 02 文档 D-4 ── */
+        --bg: #faf9f7;
+        --bg-raised: #f3f2ef;
+        --surface: #ffffff;
+        --surface-2: #f0efec;
+        --border: #e5e3de;
+        --text: #1a1816;
+        --text-2: #6b6560;
+        --text-3: #a09890;
+        --accent: #c94420;
+        --accent-2: #d97706;
+        --accent-soft: rgba(201, 68, 32, 0.08);
+        --ok: #15803d;
+        --ok-soft: rgba(21, 128, 61, 0.08);
+        --warn: #a16207;
+        --warn-soft: rgba(161, 98, 7, 0.08);
+        --shadow: 0 1px 3px rgba(26, 24, 22, 0.06);
+        --shadow-hover: 0 8px 24px rgba(26, 24, 22, 0.1);
+        color-scheme: light;
+      }
+      [data-theme='dark'] {
+        /* ── 砂石设计系统 · 暗色 ── */
+        --bg: #0a0a0c;
+        --bg-raised: #111114;
+        --surface: #18181c;
+        --surface-2: #222228;
+        --border: #2a2a30;
+        --text: #f0ece4;
+        --text-2: #a8a29e;
+        --text-3: #6b6560;
+        --accent: #e85d3a;
+        --accent-2: #f4a261;
+        --accent-soft: rgba(232, 93, 58, 0.1);
+        --ok: #34d399;
+        --ok-soft: rgba(52, 211, 153, 0.12);
+        --warn: #fbbf24;
+        --warn-soft: rgba(251, 191, 36, 0.12);
+        --shadow: none;
+        --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+        color-scheme: dark;
+      }
+
+      /* ── 本项目自有变量：不需要暗色版本，全部派生自上面的 token ── */
+      :root {
+        --font: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        --display: var(--font);
+        --mono: ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, monospace;
+        --slot-border: color-mix(in oklab, var(--accent) 35%, var(--border));
+        --slot-bg: var(--accent-soft);
+        --maxw: 1120px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.25s ease, color 0.25s ease;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      :where(a, button, [tabindex]):focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      .muted {
+        color: var(--text-3);
+      }
+      /* 散文字段里的 **强调**（见 03 文档 §4 inline() 工具） */
+      .hl {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      p {
+        text-wrap: pretty;
+      }
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+      }
+
+      /* ── 布局：顶部页眉 + 主内容 + 页脚 ── */
+      .shell {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100vh;
+      }
+      .main {
+        padding: 40px clamp(20px, 5vw, 64px);
+        width: 100%;
+        max-width: var(--maxw);
+        margin: 0 auto;
+      }
+      .footer {
+        padding: 24px clamp(20px, 5vw, 64px);
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--text-3);
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: var(--maxw);
+        margin: 0 auto;
+        width: 100%;
+      }
+    </style>
+  </body>
+</html>

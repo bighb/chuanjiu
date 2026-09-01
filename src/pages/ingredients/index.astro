@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import IngredientCard from '../../components/IngredientCard.astro';
+
+const entries = (await getCollection('bbq')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="食材档案" description="按分类、是否腌制、火候类型筛选武汉/安陆烧烤食材档案">
+  <header class="page-header">
+    <h1>食材档案</h1>
+    <p class="page-sub">已收录 {entries.length} 种 · 持续更新中</p>
+  </header>
+
+  <FilterBar />
+
+  <div class="card-grid" id="card-grid">
+    {entries.map((entry) => <IngredientCard entry={entry} />)}
+  </div>
+
+  <div class="empty-state" id="filter-empty" hidden>
+    <p>没有符合条件的食材，换个筛选条件试试。</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header h1 {
+    font-family: var(--display);
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .page-sub {
+    color: var(--text-2);
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 1023px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 639px) {
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

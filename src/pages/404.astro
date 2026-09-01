@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/url';
+---
+
+<BaseLayout title="页面未找到">
+  <div class="not-found">
+    <p class="code">404</p>
+    <h1>没找到这个页面</h1>
+    <p class="desc">链接可能写错了，或者这道菜还没上桌。</p>
+    <a href={url('')} class="btn">← 回到首页</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding: 80px 24px;
+  }
+  .code {
+    font-family: var(--display);
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--accent-soft);
+    margin: 0;
+    line-height: 1;
+  }
+  h1 {
+    font-family: var(--display);
+    font-size: 24px;
+    margin: 8px 0 8px;
+  }
+  .desc {
+    color: var(--text-2);
+    margin: 0 0 24px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+</style>

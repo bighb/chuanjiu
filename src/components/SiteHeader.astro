@@ -1,0 +1,148 @@
+---
+import { url } from '../lib/url';
+
+const path = Astro.url.pathname;
+const isHome = path === url('');
+const isIngredients = path.startsWith(url('ingredients'));
+---
+
+<header class="site-header">
+  <a href={url('')} class="brand">
+    <span class="brand-name">串究</span>
+    <span class="brand-sub">武汉 · 安陆烧烤研究</span>
+  </a>
+
+  <nav class="nav">
+    <a href={url('')} class:list={[{ active: isHome }]}>首页</a>
+    <a href={url('ingredients')} class:list={[{ active: isIngredients }]}>食材档案</a>
+  </nav>
+
+  <div class="header-actions">
+    <button class="theme-toggle" data-theme-toggle type="button" aria-label="切换亮色 / 暗色主题">
+      <svg class="sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+      </svg>
+    </button>
+    <a href="/" class="portal-link">← Ben's Portal</a>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (!(target instanceof Element) || !target.closest('[data-theme-toggle]')) return;
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px clamp(20px, 5vw, 64px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    letter-spacing: 3px;
+  }
+  .nav {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+  .nav a {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: var(--text-2);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav a:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .nav a.active {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .theme-toggle .moon {
+    display: none;
+  }
+  /* data-theme 写在 <html> 上（BaseLayout 里），不是本组件渲染的元素——
+     scoped 样式会给这段选择器也加上 scope 属性导致永远不命中，用 :global() 跳过 */
+  :global([data-theme='dark']) .theme-toggle .sun {
+    display: none;
+  }
+  :global([data-theme='dark']) .theme-toggle .moon {
+    display: inline-flex;
+  }
+  .portal-link {
+    font-size: 13px;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  .portal-link:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .brand-sub {
+      display: none;
+    }
+    .portal-link {
+      display: none;
+    }
+  }
+</style>

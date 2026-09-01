@@ -1,0 +1,69 @@
+---
+import { inline } from './inline';
+
+interface Props {
+  wuhan?: string;
+  anlu?: string;
+}
+const { wuhan, anlu } = Astro.props;
+const cols = [wuhan, anlu].filter(Boolean).length;
+---
+
+{
+  cols > 0 && (
+    <div class="local-compare" style={`grid-template-columns: repeat(${cols}, 1fr)`}>
+      {wuhan && (
+        <div class="compare-col wuhan">
+          <span class="compare-label">武汉</span>
+          <p set:html={inline(wuhan)} />
+        </div>
+      )}
+      {anlu && (
+        <div class="compare-col anlu">
+          <span class="compare-label">安陆</span>
+          <p set:html={inline(anlu)} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .local-compare {
+    display: grid;
+    gap: 16px;
+  }
+  .compare-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .compare-col.anlu {
+    border-top-color: var(--accent-2);
+  }
+  .compare-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-3);
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .compare-col p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .compare-col :global(.hl) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .local-compare {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>

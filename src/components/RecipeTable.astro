@@ -1,0 +1,108 @@
+---
+import { inline } from './inline';
+
+interface Props {
+  basis?: string;
+  rows: { name: string; amount: string; purpose: string }[];
+}
+const { basis, rows } = Astro.props;
+---
+
+<div class="recipe-table">
+  {basis && <p class="basis">配方基准：{basis}</p>}
+  <table>
+    <thead>
+      <tr>
+        <th>用料</th>
+        <th>用量</th>
+        <th>作用</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr>
+            <td data-label="用料">{r.name}</td>
+            <td data-label="用量">{r.amount}</td>
+            <td data-label="作用" set:html={inline(r.purpose)} />
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .basis {
+    font-size: 13px;
+    color: var(--text-3);
+    margin: 0 0 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th {
+    background: var(--surface-2);
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  tbody td:first-child {
+    color: var(--text);
+    font-weight: 600;
+  }
+  tbody td :global(.hl) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    thead {
+      display: none;
+    }
+    table,
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+    tr {
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    td {
+      border-bottom: none;
+      padding: 2px 0;
+    }
+    td[data-label='用料'] {
+      display: inline;
+      font-weight: 700;
+      color: var(--text);
+    }
+    td[data-label='用料']::after {
+      content: ' · ';
+      color: var(--text-3);
+      font-weight: 400;
+    }
+    td[data-label='用量'] {
+      display: inline;
+    }
+    td[data-label='作用'] {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+  }
+</style>

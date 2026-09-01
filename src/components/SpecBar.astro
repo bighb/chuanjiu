@@ -1,0 +1,46 @@
+---
+interface Props {
+  specs: { label: string; value: string }[];
+}
+const { specs } = Astro.props;
+---
+
+<div class="spec-bar">
+  {
+    specs.map((s) => (
+      <div class="spec">
+        <span class="spec-label">{s.label}</span>
+        <span class="spec-value">{s.value}</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .spec-bar {
+    display: flex;
+    gap: 24px;
+  }
+  .spec {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .spec-label {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .spec-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .spec-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  }
+</style>

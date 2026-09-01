@@ -1,0 +1,78 @@
+---
+import { inline } from './inline';
+
+interface Props {
+  items: { when: string; what: string; body: string }[];
+}
+const { items } = Astro.props;
+---
+
+<ol class="timeline">
+  {
+    items.map((it) => (
+      <li class="timeline-item">
+        <div class="dot-col">
+          <span class="dot" />
+        </div>
+        <div class="timeline-body">
+          <p class="timeline-head">
+            <strong>{it.when}</strong> · {it.what}
+          </p>
+          <p class="timeline-desc" set:html={inline(it.body)} />
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .dot-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 10px;
+    flex-shrink: 0;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .timeline-item:not(:last-child) .dot-col::after {
+    content: '';
+    flex: 1;
+    width: 2px;
+    background: var(--border);
+    margin-top: 4px;
+  }
+  .timeline-body {
+    flex: 1;
+    padding-bottom: 20px;
+  }
+  .timeline-head {
+    margin: 0 0 4px;
+    font-size: 14px;
+  }
+  .timeline-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+  .timeline-desc :global(.hl) {
+    color: var(--accent);
+  }
+</style>

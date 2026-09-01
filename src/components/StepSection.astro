@@ -1,0 +1,56 @@
+---
+interface Props {
+  no: string; // '01' … '05'
+  title: string;
+  subtitle?: string;
+  id: string;
+}
+const { no, title, subtitle, id } = Astro.props;
+---
+
+<section class="step-section" id={id}>
+  <div class="step-head">
+    <span class="step-no">{no}</span>
+    <div class="step-head-text">
+      <h2 class="step-title">{title}</h2>
+      {subtitle && <p class="step-subtitle">{subtitle}</p>}
+    </div>
+  </div>
+  <div class="step-body">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .step-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: clamp(24px, 4vw, 40px);
+  }
+  .step-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .step-no {
+    font-family: var(--display);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--accent-soft);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .step-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--text-3);
+  }
+</style>
