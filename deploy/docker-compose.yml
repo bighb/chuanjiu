@@ -6,7 +6,9 @@ services:
     ports:
       - "127.0.0.1:8010:80"      # 只绑本地回环，只允许宿主 nginx 反代进来
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/bbq/"]
+      # 用 127.0.0.1 不用 localhost：容器 /etc/hosts 里 localhost 同时有 IPv4/IPv6，
+      # 但 nginx 只监听了纯 IPv4 的 0.0.0.0:80，解析成 ::1 会连接被拒（服务本身没问题）
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/bbq/"]
       interval: 30s
       timeout: 5s
       retries: 3
