@@ -8,6 +8,11 @@ import IngredientCard from '../components/IngredientCard.astro';
 const entries = (await getCollection('bbq')).sort((a, b) => a.data.order - b.data.order);
 const featured = entries.slice(0, 3);
 
+// 首页主图没有对应的内容文件，走约定路径 + glob：图片不存在时 Object.values(...)[0] 是
+// undefined，PhotoSlot 自动落回占位框——不用为了这一张图专门开一个 site 数据文件。
+const heroImages = import.meta.glob('../assets/site/hero.*', { eager: true });
+const heroPhoto = Object.values(heroImages)[0]?.default;
+
 const STEPS = [
   {
     no: '01',
@@ -59,7 +64,7 @@ const STEPS = [
       </div>
     </div>
     <div class="hero-photo">
-      <PhotoSlot ratio="4/3" label="站点主视觉 · 待补实拍图" hint="整炉烧烤的全景，突出烟火气" />
+      <PhotoSlot photo={heroPhoto} alt="串究 · 一炉炭火烧烤的实景" ratio="4/3" label="站点主视觉 · 待补实拍图" hint="整炉烧烤的全景，突出烟火气" />
     </div>
   </section>
 
