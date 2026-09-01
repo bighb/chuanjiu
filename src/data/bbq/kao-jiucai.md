@@ -9,7 +9,7 @@ updated: 2026-08-31
 photoHint: 出炉即拍，突出边缘微焦与韭菜的翠绿色泽
 
 marinate: none
-heatProfile: 超猛火
+heatProfile: 猛火快烤
 
 specs:
   - label: 处理方式
